@@ -34,13 +34,7 @@ const register = async (req, res) => {
       return res.status(422).json({ errors: errors.array() });
     }
 
-    const {
-      firstName,
-      lastName,
-      mobileNumber,
-      emailId,
-      password,
-    } = req.body;
+    const { firstName, lastName, mobileNumber, emailId, password } = req.body;
 
     const userExists = await User.findOne({
       $or: [{ mobileNumber }, { email: emailId }],
@@ -51,7 +45,6 @@ const register = async (req, res) => {
       });
     }
 
-    
     const newUser = new User({
       firstName,
       lastName,
@@ -60,15 +53,10 @@ const register = async (req, res) => {
       password,
     });
 
-     
     await newUser.save();
-const token = jwt.sign(
-  { userId: newUser._id},
-  process.env.SECRET_KEY,
-  {
-    expiresIn: "720h",
-  }
-);
+    const token = jwt.sign({ userId: newUser._id }, process.env.SECRET_KEY, {
+      expiresIn: "720h",
+    });
     res.status(201).json({
       message: "User registered successfully",
       token,
@@ -134,12 +122,10 @@ const login = async (req, res) => {
   }
 };
 
-
 const getProfileData = async (req, res) => {
   try {
-    
-    const userId = req.user.userId;  
- 
+    const userId = req.user.userId;
+
     const user = await User.findById(userId).select("-password");
     if (!user) {
       return res.status(404).json({ error: "User not found" });
@@ -150,8 +136,6 @@ const getProfileData = async (req, res) => {
     res.status(500).json({ error: "Something went wrong" });
   }
 };
-
-
 
 const Auth = {
   register,
